@@ -1,0 +1,56 @@
+---
+title: "W01_homework_fnh"
+author: "Frederik Normann Holm"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mapping ruins in New South Wales using Leaflet
+
+The following assignment attempts to map the coordinates of several ruins in New South Wales 
+
+Firstly i load the necessary packages 
+```{r packages}
+library(leaflet)
+library(tidyverse)
+library(dplyr)
+```
+
+## Now for the coordinates
+
+in the following section, i will plot the coordinates of the ruins in an interactive map that can be accessed via a browser
+first i load the data via 'read.csv()' and print it to check if it worked
+i remove the last row from the dataframe because it contains NA's and that interferes with my leaflet plot
+
+```{r read csv}
+ruins <- read.csv(file = "data/RCFeature2018.csv")
+ruinsdf <- as.data.frame(ruins)
+ruinsdf2 <- ruinsdf[-257,]
+head(ruinsdf2)
+```
+
+Now for mapping the coordinates, i only want the "Latitude" and "Longtitude" columns.
+for this i simply write the names of the columns in my lines of code
+
+```{r leaflet map}
+ruinsnsw <- leaflet(ruinsdf2) %>%
+            addTiles() %>%
+            addAwesomeMarkers(lng = ruinsdf2$Longitude, 
+                              lat = ruinsdf2$Latitude, 
+                              popup = paste("FeatureID:", ruinsdf2$FeatureID, "<br>",
+                                            "FeatureType:", ruinsdf2$FeatureType, "<br>",
+                                            "Description:", ruinsdf2$Description))
+ruinsnsw
+```
+
+This is all my head could wrap around for now after struggling to figure out a neat way to include FeatureID, FeatureType and Description for a while
+
+```{r save as html}
+library(htmlwidgets)
+saveWidget(ruinsnsw, "ruinsnsw.html", selfcontained = TRUE)
+```
+
